@@ -4,9 +4,13 @@ defmodule RacquetFun.Application do
   @moduledoc false
 
   use Application
+  require EventBus
 
   @impl true
   def start(_type, _args) do
+    # EventBus configuration
+    EventBus.subscribe({RacquetFun.Auth.Consumers.UserSignedUp, ["^user_signed_up"]})
+
     children = [
       # Start the Ecto repository
       RacquetFun.Repo,
@@ -15,7 +19,9 @@ defmodule RacquetFun.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: RacquetFun.PubSub},
       # Start the Endpoint (http/https)
-      RacquetFunWeb.Endpoint
+      RacquetFunWeb.Endpoint,
+      # Start the PromEx metrics collector
+      RacquetFun.PromEx
       # Start a worker by calling: RacquetFun.Worker.start_link(arg)
       # {RacquetFun.Worker, arg}
     ]

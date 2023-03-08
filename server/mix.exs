@@ -35,14 +35,25 @@ defmodule RacquetFun.MixProject do
     [
       {:phoenix, "~> 1.6.15"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.6"},
-      {:myxql, ">= 0.0.0"},
+      {:ecto, "~> 3.9.4"},
+      {:ecto_sql, "~> 3.9"},
+      {:ecto_ulid, "~> 0.3.0"},
+      {:postgrex, "~> 0.16.5"},
       {:phoenix_live_dashboard, "~> 0.6"},
       {:swoosh, "~> 1.3"},
+      {:phoenix_swoosh, "~> 1.1.0"},
+      {:phoenix_html, "~> 3.3"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5.1"},
+      {:event_bus, "~> 1.7"},
+      {:tarams, "~> 1.7"},
+      {:bcrypt_elixir, "~> 3.0"},
+      {:castore, "~> 0.1.22", override: true},
+      {:finch, "~> 0.10.2"},
+      {:telemetry, "~> 1.0", override: true},
+      {:prom_ex, "~> 1.7.1"}
     ]
   end
 

@@ -7,6 +7,9 @@ defmodule RacquetFunWeb.Router do
 
   scope "/api", RacquetFunWeb do
     pipe_through :api
+
+    post "/auth/sign-up", AuthController, :sign_up
+    get "/auth/activate", AuthController, :activate
   end
 
   # Enables LiveDashboard only for development

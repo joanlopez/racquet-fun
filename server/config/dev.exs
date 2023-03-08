@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :racquet_fun, RacquetFun.Repo,
-  username: "root",
-  password: "",
+  username: "racquet",
+  password: "racquet",
   hostname: "localhost",
-  database: "racquet_fun_dev",
+  database: "racquet",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
