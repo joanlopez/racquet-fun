@@ -53,7 +53,9 @@ defmodule RacquetFun.MixProject do
       {:castore, "~> 0.1.22", override: true},
       {:finch, "~> 0.10.2"},
       {:telemetry, "~> 1.0", override: true},
-      {:prom_ex, "~> 1.7.1"}
+      {:prom_ex, "~> 1.7.1"},
+      {:guardian, "~> 2.3"},
+      {:logfmt, "~> 3.3"}
     ]
   end
 

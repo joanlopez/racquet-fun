@@ -10,6 +10,7 @@ defmodule RacquetFun.Application do
   def start(_type, _args) do
     # EventBus configuration
     EventBus.subscribe({RacquetFun.Auth.Consumers.UserSignedUp, ["^user_signed_up"]})
+    EventBus.subscribe({RacquetFun.Player.Consumers.UserActivated, ["^user_activated"]})
 
     children = [
       # Start the Ecto repository

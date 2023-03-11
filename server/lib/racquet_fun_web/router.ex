@@ -3,13 +3,27 @@ defmodule RacquetFunWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug RacquetFunUtil.Plug.Logger, level: :info
   end
 
-  scope "/api", RacquetFunWeb do
+  pipeline :authenticated do
+    plug Guardian.Plug.VerifyHeader,
+      module: RacquetFun.Auth.Guardian,
+      error_handler: RacquetFunWeb.Auth.ErrorHandler
+  end
+
+  scope "/api/auth", RacquetFunWeb do
     pipe_through :api
 
-    post "/auth/sign-up", AuthController, :sign_up
-    get "/auth/activate", AuthController, :activate
+    post "/sign-up", Auth.Controller, :sign_up
+    get "/activate", Auth.Controller, :activate
+    post "/sign-in", Auth.Controller, :sign_in
+  end
+
+  scope "/api/player", RacquetFunWeb do
+    pipe_through [:api, :authenticated]
+
+    get "/profile", Player.Controller, :get_profile
   end
 
   # Enables LiveDashboard only for development

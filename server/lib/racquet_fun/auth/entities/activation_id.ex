@@ -6,11 +6,11 @@ defmodule RacquetFun.Auth.Entities.ActivationId do
   alias Ecto.ULID, as: ULID
   alias RacquetFun.Auth.Entities
 
-  @enforce_keys [:email, :activation_id, :until, :activated]
+  @enforce_keys [:id, :user_id, :until, :activated]
 
   defstruct [
-    :email,
-    :activation_id,
+    :id,
+    :user_id,
     :until,
     :activated
   ]
@@ -23,24 +23,24 @@ defmodule RacquetFun.Auth.Entities.ActivationId do
   * :until - Date for which the id is valid
   """
   @type t :: %__MODULE__{
-          email: String.t(),
-          activation_id: String.t(),
+          id: String.t(),
+          user_id: String.t(),
           until: Date.t(),
           activated: boolean
         }
 
   @schema %{
-    email: [type: :string, required: true, length: [min: 6]],
-    activation_id: [type: :string, required: true, length: [equal_to: 26]],
+    id: [type: :string, required: true, length: [equal_to: 26]],
+    user_id: [type: :string, required: true, length: [equal_to: 26]],
     until: [type: :date, required: true],
     activated: [type: :boolean, required: false]
   }
 
-  @spec for(%{required(:email) => String.t()}) :: {:ok, __MODULE__.t()} | {:ko, errors :: map()}
-  def for(email) do
+  @spec for(String.t()) :: {:ok, __MODULE__.t()} | {:ko, errors :: map()}
+  def for(user_id) do
     params = %{
-      email: email,
-      activation_id: ULID.generate(),
+      id: ULID.generate(),
+      user_id: user_id,
       until: Date.utc_today(),
       activated: false
     }
@@ -56,19 +56,19 @@ defmodule RacquetFun.Auth.Entities.ActivationId.Schema do
 
   use Ecto.Schema
   import Ecto.Changeset
-  @primary_key {:activation_id, :string, autogenerate: false}
+  @primary_key {:id, :string, autogenerate: false}
 
   schema "activation_ids" do
-    # field :activation_id, :string
-    field :email, :string
+    # field :id, :string
+    field :user_id, :string
     field :until, :date
     field :activated, :boolean, default: false
   end
 
   def changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:email, :activation_id, :until, :activated])
-    |> validate_required([:email, :activation_id, :until])
-    |> unique_constraint(:activation_id)
+    |> cast(attrs, [:id, :user_id, :until, :activated])
+    |> validate_required([:id, :user_id, :until])
+    |> unique_constraint(:id)
   end
 end

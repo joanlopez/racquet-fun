@@ -3,11 +3,11 @@ defmodule RacquetFun.Mailer.UserWelcome do
     template_root: "lib/racquet_fun/mailer",
     template_path: "user_welcome"
 
-  def build({name, email} = to, %{activation_id: activation_id}) do
+  def build({name, _email} = to, %{id: id, user_id: user_id}) do
     link =
       RacquetFunWeb.Endpoint.url()
       |> URI.merge("api/auth/activate")
-      |> URI.merge("?email=#{email}&activation_id=#{activation_id}")
+      |> URI.merge("?user_id=#{user_id}&activation_id=#{id}")
       |> URI.to_string()
 
     new()

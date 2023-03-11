@@ -3,7 +3,6 @@ defmodule RacquetFun.Auth.Consumers.UserSignedUp do
   Events.UserSignedUp consumer.
   """
 
-  import Bcrypt
   alias EventBus.Model.Event, as: BaseEvent
   alias RacquetFun.Mailer
   alias RacquetFun.Auth.{Repo, Entities.ActivationId, Events.UserSignedUp}
@@ -22,11 +21,10 @@ defmodule RacquetFun.Auth.Consumers.UserSignedUp do
   defp consume(%BaseEvent{data: %UserSignedUp{user: user}} = event) do
     Logger.info("Consuming event: #{inspect(event)}")
 
-    # In case of (db) error we need to retry it?
-    with {:ok, activation_id} <- ActivationId.for(user.email),
-         {:ok, _activation_id_res} <- Repo.save_activation_id(activation_id),
-         {:ok, password_hash} <- hash_password(user.password),
-         {:ok, _user_res} <- save_user(%{user | password: password_hash}),
+    # fixme: retries; idempotency
+    with {:ok, _user_res} <- save_user(user),
+         {:ok, activation_id} <- ActivationId.for(user.id),
+         {:ok, _activation_id_res} <- Repo.activation_id_save(activation_id),
          {:ok, _email_res} <- send_welcome_email(user, activation_id) do
       :ok
     end
@@ -36,24 +34,28 @@ defmodule RacquetFun.Auth.Consumers.UserSignedUp do
     Logger.error(["Unsupported event: ", event])
   end
 
-  defp hash_password(password) do
-    case add_hash(password) do
-      %{password_hash: password_hash} -> {:ok, password_hash}
-    end
-  end
-
   defp save_user(user) do
-    case Repo.save_user(user) do
+    case Repo.user_save(user) do
       {:ok, result} ->
         Logger.info("User(#{user.email}) successfully stored into the database")
         {:ok, result}
 
-      {:error, errors} ->
-        Logger.error(
-          "User(#{user.email}) could not be stored into the database: #{inspect(errors)}"
-        )
+      error ->
+        # In case of unique constraint, here is how it looks like:
+        # [email: {"has already been taken", [constraint: :unique, constraint_name: "users_email_index"]}]
+        case error do
+          {:error, %Ecto.Changeset{errors: errors}} ->
+            Logger.error(
+              "User(#{user.email}) could not be stored into the database: #{inspect(errors)}"
+            )
 
-        {:error, errors}
+          {:error, errors} ->
+            Logger.error(
+              "User(#{user.email}) could not be stored into the database: #{inspect(errors)}"
+            )
+        end
+
+        error
     end
   end
 

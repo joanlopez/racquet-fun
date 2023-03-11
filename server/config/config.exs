@@ -11,12 +11,19 @@ config :racquet_fun,
   ecto_repos: [RacquetFun.Repo],
   generators: [binary_id: true]
 
+config :racquet_fun, RacquetFun.Repo, migration_primary_key: false
+
 # Configures the endpoint
 config :racquet_fun, RacquetFunWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: RacquetFunWeb.ErrorView, accepts: ~w(json), layout: false],
   pubsub_server: RacquetFun.PubSub,
   live_view: [signing_salt: "x3B/ibkr"]
+
+# Configures the auth guardian (JWT)
+config :racquet_fun, RacquetFun.Auth.Guardian,
+  issuer: "racquet_fun",
+  secret_key: "XSqbAHgpRCYzVbAlr+k1kqXVgTZzwvNWPB82Ie3lQFXY/bXWYQJ/i7OBgtGb28sT"
 
 # Configures the mailer
 #
@@ -32,16 +39,32 @@ config :swoosh, :api_client, false
 
 # Configures Elixir's Logger
 config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+  format: {RacquetFunUtil.Logger.Logfmt, :format},
+  metadata: [
+    # app
+    :application,
+    :module,
+    :function,
+    :file,
+    :line,
+    # web
+    :method,
+    :path,
+    :status_code,
+    :elapsed
+  ]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Disable default logger in Phoenix
+config :phoenix, :logger, false
+
 # Config the message bus topics to register
 config :event_bus,
   topics: [
-    :user_signed_up
+    :user_signed_up,
+    :user_activated
   ]
 
 # Import environment specific config. This must remain at the bottom
